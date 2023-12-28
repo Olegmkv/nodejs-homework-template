@@ -2,8 +2,6 @@ import app from "./app.js"
 import mongoose from "mongoose";
 
 const { DB_HOST, PORT = 3000 } = process.env;
-// Olegmkv
-// bdB7ayhlzVBXOX1y
 
 mongoose.connect(DB_HOST)
   .then(() => {
