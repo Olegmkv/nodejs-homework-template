@@ -38,88 +38,25 @@ contactSchema.pre("findOneAndUpdate", addUpdateSettings);
 
 
 // joi схеми та функції для перевірки фронтенда
-const schemeAddContact = Joi.object({
+export const schemeAddContact = Joi.object({
     name: Joi.string().required().min(2),
     email: Joi.string().required().min(5),
     phone: Joi.string().required().min(5),
     favorite: Joi.boolean(),
 });
 
-const schemeChangeContact = Joi.object({
+export const schemeChangeContact = Joi.object({
     name: Joi.string().min(2),
     email: Joi.string().min(5),
     phone: Joi.string().min(5),
     favorite: Joi.boolean(),
 });
 
-const schemeUpdateStatus = Joi.object({
+export const schemeUpdateStatus = Joi.object({
     favorite: Joi.boolean().required(),
 });
 
-export const validateAddContact = async (req, res, next) => {
-    try {
-        const contact = req.body;
-        const { error } = schemeAddContact.validate(contact);
-        if (error) {
-            throw HttpError(400, error.message);
-        }
-        next();
-    } catch (error) {
-        next(error);
-    }
-}
-
-export const validateChangeContact = async (req, res, next) => {
-    try {
-        const contact = req.body;
-        const { error } = schemeChangeContact.validate(contact);
-        if (error) {
-            throw HttpError(400, error.message);
-        }
-        next();
-    } catch (error) {
-        next(error);
-    }
-}
-
-export const validateUpdateStatus = async (req, res, next) => {
-    try {
-        const contact = req.body;
-        const { error } = schemeUpdateStatus.validate(contact);
-        if (error) {
-            throw HttpError(400, error.message);
-        }
-        next();
-    } catch (error) {
-        next(error);
-    }
-}
-
-
 // створюємо модель-класс
-const Movie = model("contact", contactSchema);
+const Contact = model("contact", contactSchema);
 
-export default Movie
-
-
-
-
-// const fs = require('fs/promises')
-
-// const listContacts = async () => {}
-
-// const getContactById = async (contactId) => {}
-
-// const removeContact = async (contactId) => {}
-
-// const addContact = async (body) => {}
-
-// const updateContact = async (contactId, body) => {}
-
-// module.exports = {
-//   listContacts,
-//   getContactById,
-//   removeContact,
-//   addContact,
-//   updateContact,
-// }
+export default Contact
