@@ -1,10 +1,13 @@
 import express from 'express';
+import authController from '../../controllers/authController.js';
 import { isValidId, isEmptyBody } from '../../middlewares/validates/index.js';
-
+import validateBody from '../../decorators/validateBody.js';
+import { userSigninSchema, userSignupSchema } from '../../models/Users.js';
 
 const authRouter = express.Router();
 
-// authRouter.get('/', contactsController.getAll);
+authRouter.post('/signup', isEmptyBody, validateBody(userSignupSchema), authController.signup);
 
+authRouter.post('/signin', isEmptyBody, validateBody(userSigninSchema), authController.signin);
 
 export default authRouter;

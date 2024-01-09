@@ -1,6 +1,6 @@
 import Contact from "../models/Contact.js"
 import { HttpError } from "../helpers/index.js";
-import { ctrlWrapper } from "../decorators/ctrlWrapper.js";
+import ctrlWrapper from "../decorators/ctrlWrapper.js";
 
 const getAll = async (req, res) => {
   const list = await Contact.find();
@@ -32,7 +32,7 @@ const deleteContact = async (req, res, next) => {
 
 const putContact = async (req, res, next) => {
   const { body, params: { contactId } } = req;
-
+console.log('put=> ',body);
   const update = await Contact.findByIdAndUpdate(contactId, body);
     
   if (!update) {

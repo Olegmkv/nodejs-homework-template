@@ -11,13 +11,5 @@ mongoose.connect(DB_HOST)
   })
   .catch(error => {
     console.log(error.message);
-    process.exit(1);  
+    process.exit(1);
   })
-
-
-
-// const app = require('./app')
-
-// app.listen(3000, () => {
-//   console.log("Server running. Use our API on port: 3000")
-// })

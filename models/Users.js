@@ -1,12 +1,11 @@
 import { Schema, model } from "mongoose";
-import { handleSaveError,addUpdateSettings } from "./hooks.js";
 import Joi from "joi";
-import HttpError from "../helpers/HttpError.js"
+import { handleSaveError,addUpdateSettings } from "./hooks.js";
 
 const emailRegexp =/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
 
 const userSchema = new Schema({
-    urername: {
+    username: {
         type: String,
         required: true,
     },
@@ -27,23 +26,23 @@ const userSchema = new Schema({
 });
 
 // монгус хук: після додавання, при помилці, 
-// задати статус помилки 400 і продовжити виконання коду
-authSchema.post("save", handleSaveError);
+// задати статус помилки 400,409 і продовжити виконання коду
+userSchema.post("save", handleSaveError);
 
-// після оновлення, в разі помилки задати їй стаус 400  
-authSchema.post("findOneAndUpdate",handleSaveError)
+// після оновлення, в разі помилки задати їй стаус 400,409  
+userSchema.post("findOneAndUpdate",handleSaveError)
 
 // перед оновленням задати параметри налаштування
-authSchema.pre("findOneAndUpdate", addUpdateSettings);
+userSchema.pre("findOneAndUpdate", addUpdateSettings);
 
 // joi схеми та функції для перевірки фронтенда
-const userSignupSchema = Joi.object({
+export const userSignupSchema = Joi.object({
     username: Joi.string().required().min(2),
     email: Joi.string().pattern(emailRegexp).required().min(5),
     password: Joi.string().required().min(6),
 });
 
-const userSigninSchema = Joi.object({
+export const userSigninSchema = Joi.object({
     email: Joi.string().pattern(emailRegexp).required().min(5),
     password: Joi.string().required().min(6),
 });
