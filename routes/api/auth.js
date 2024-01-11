@@ -2,16 +2,18 @@ import express from 'express';
 import authController from '../../controllers/authController.js';
 import { authenticate, isEmptyBody } from '../../middlewares/validates/index.js';
 import validateBody from '../../decorators/validateBody.js';
-import { userSigninSchema, userSignupSchema } from '../../models/Users.js';
+import { userSigninSchema, userSignupSchema, userSubscribeSchema } from '../../models/Users.js';
 
 const authRouter = express.Router();
 
-authRouter.post('/signup', isEmptyBody, validateBody(userSignupSchema), authController.signup);
+authRouter.post('/register', isEmptyBody, validateBody(userSignupSchema), authController.register);
 
-authRouter.post('/signin', isEmptyBody, validateBody(userSigninSchema), authController.signin);
+authRouter.post('/login', isEmptyBody, validateBody(userSigninSchema), authController.login);
 
-authRouter.get('/current', authenticate, authController.getCurrent);
+authRouter.get('/current', authenticate, authController.current);
 
-authRouter.post('/signout', authenticate, authController.signout);
+authRouter.post('/logout', authenticate, authController.logout);
+
+authRouter.patch('/', authenticate, validateBody(userSubscribeSchema), authController.subscription);
 
 export default authRouter;

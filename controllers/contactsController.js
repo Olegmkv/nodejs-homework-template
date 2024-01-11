@@ -1,15 +1,25 @@
 import Contact from "../models/Contact.js"
 import { HttpError } from "../helpers/index.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
+import { trusted } from "mongoose";
 
+// повернення власнику всіх його контактів з урахуванням значення поля фаворіт та пагінацією
 const getAll = async (req, res) => {
   const { _id: owner } = req.user;
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 20 } = req.query;
   const skip = (page - 1) * limit;
-  const list = await Contact.find({ owner }, "-createdAt -updatedAt", { skip, limit }).populate("owner", "username");
+  
+  const query = { owner }
+  if (req.query.hasOwnProperty("favorite")) {
+    query.favorite = req.query.favorite;
+  };
+
+  const list = await Contact.find({ ...query }, "-createdAt -updatedAt", { skip, limit }).populate("owner", "username");
+
   res.json(list);
 };
 
+// повернення власнику одного контакта за ід 
 const getContact = async (req, res, next) => {
   const { contactId: _id } = req.params;
   const { _id: owner } = req.user;
@@ -20,12 +30,14 @@ const getContact = async (req, res, next) => {
   res.json(getId)
 };
 
+// додавання контакта власнику
 const addContact = async (req, res, next) => {
   const { _id: owner } = req.user;
   const add = await Contact.create({ ...req.body, owner });
   res.status(201).json(add)
 };
 
+// видалення контакту власника за ід
 const deleteContact = async (req, res, next) => {
   const { contactId: _id } = req.params;
   const { _id: owner } = req.user;
@@ -36,6 +48,7 @@ const deleteContact = async (req, res, next) => {
   res.json(remove)
 };
 
+// оновлення контакту власника за ід
 const putContact = async (req, res, next) => {
   const { body, params: { contactId: _id } } = req;
   const { _id: owner } = req.user;

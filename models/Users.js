@@ -3,12 +3,9 @@ import Joi from "joi";
 import { handleSaveError,addUpdateSettings } from "./hooks.js";
 
 const emailRegexp =/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
+const subscriptionExp = ["starter", "pro", "business"];
 
 const userSchema = new Schema({
-    username: {
-        type: String,
-        required: true,
-    },
     email: {
         type: String,
         match: emailRegexp,
@@ -22,7 +19,7 @@ const userSchema = new Schema({
     },
     subscription: {
         type: String,
-        enum: ["starter", "pro", "business"],
+        enum: subscriptionExp,
         default: "starter"
     },
     token: {
@@ -45,7 +42,6 @@ userSchema.pre("findOneAndUpdate", addUpdateSettings);
 
 // joi схеми та функції для перевірки фронтенда
 export const userSignupSchema = Joi.object({
-    username: Joi.string().required().min(2),
     email: Joi.string().pattern(emailRegexp).required().min(5),
     password: Joi.string().required().min(6),
 });
@@ -55,6 +51,9 @@ export const userSigninSchema = Joi.object({
     password: Joi.string().required().min(6),
 });
 
+export const userSubscribeSchema = Joi.object({
+    subscription: Joi.string().valid(...subscriptionExp)
+})
 
 // створюємо модель-класс
 const User = model("user", userSchema);

@@ -8,12 +8,12 @@ const authenticate = async (req, res, next) => {
     // розбираємо заголовок
     const { authorization } = req.headers;
     if (!authorization) {
-        return next(HttpError(401, "Authorization not define"));
+        return next(HttpError(401, "Not authorized"));
     };
     // виділяємо токен
     const [bearer, token] = authorization.split(" ");
     if (!bearer === "Bearer") {
-        return next(HttpError(401, "Not Bearer"));
+        return next(HttpError(401, "No Bearer autorization"));
     };
     // верифікуємо токен, порівнюємо зі збереженим в базі у користувача
     try {
@@ -21,7 +21,7 @@ const authenticate = async (req, res, next) => {
         const user = await User.findById(id);
 
         if (!user || !user.token || token !== user.token) {
-            return next(HttpError(401));
+            return next(HttpError(401, "Not authorized"));
         };
 
         // зберігаємо для інших маршрутів користувача

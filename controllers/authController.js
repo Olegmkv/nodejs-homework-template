@@ -7,7 +7,7 @@ import ctrlWrapper from "../decorators/ctrlWrapper.js";
 const { JWT_SECRET } = process.env;
 
 // реєстрація
-const signup = async (req, res) => {
+const register = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     
@@ -19,26 +19,27 @@ const signup = async (req, res) => {
     // додаємо користувача з хешованим паролем
     const hashPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({ ...req.body, password: hashPassword });
-    res.json({
-        username: newUser.username,
-        email: newUser.email,
-    });
+    res.status(201).json({
+        user: {
+            email: newUser.email,
+            subscription: newUser.subscription,
+    }});
 };
 
 // автентифікація
-const signin = async (req, res) => {
+const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     
     // перевіряємо логін
     if (!user) {
-        throw HttpError(400, "Email or password invalid");
+        throw HttpError(400, "Email or password is wrong");
     };
     
+    // звіряємо пароль з захешованим в базі 
     const passwordCompare = await bcrypt.compare(password, user.password);
-    
     if (!passwordCompare) {
-        throw HttpError(400, "Email or password invalid");
+        throw HttpError(400, "Email or password is wrong");
     };
     
     // формуємо/записуємо токен в базу користувачу
@@ -53,11 +54,15 @@ const signin = async (req, res) => {
     
     res.json({
         token,
+        user: {
+            email: user.email,
+            subscription: user.subscription,
+        }
     });
 };
 
 // повертаємо дані користувача
-const getCurrent = async (req, res) => {
+const current = async (req, res) => {
     const { username, email } = req.user;
     res.json({
         username,
@@ -66,7 +71,7 @@ const getCurrent = async (req, res) => {
 }
 
 // розлогінювання користувача , прибираєм його токен з бази
-const signout = async (req, res) => {
+const logout = async (req, res) => {
     const { _id } = req.user;
     await User.findByIdAndUpdate(_id, { token: "" });
     res.json({
@@ -74,9 +79,19 @@ const signout = async (req, res) => {
     })
 }
 
+const subscription = async (req, res) => {
+   const { _id } = req.user; 
+   const { subscription = "starter" } = req.query;
+   await User.findByIdAndUpdate(_id, { subscription });
+   res.json({
+       message: "Subscription updated"
+   }) 
+}
+
 export default {
-    signup: ctrlWrapper(signup),
-    signin: ctrlWrapper(signin),
-    getCurrent: ctrlWrapper(getCurrent),
-    signout: ctrlWrapper(signout),
+    register: ctrlWrapper(register),
+    login: ctrlWrapper(login),
+    current: ctrlWrapper(current),
+    logout: ctrlWrapper(logout),
+    subscription: ctrlWrapper(subscription),
 }
