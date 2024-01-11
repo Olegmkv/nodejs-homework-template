@@ -3,40 +3,47 @@ import { HttpError } from "../helpers/index.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
 
 const getAll = async (req, res) => {
-  const list = await Contact.find();
-  res.json(list)
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
+  const list = await Contact.find({ owner }, "-createdAt -updatedAt", { skip, limit }).populate("owner", "username");
+  res.json(list);
 };
 
 const getContact = async (req, res, next) => {
-  const { contactId } = req.params;
-  const getId = await Contact.findById(contactId);
+  const { contactId: _id } = req.params;
+  const { _id: owner } = req.user;
+  const getId = await Contact.findOne({ _id, owner });
   if (!getId) {
-    throw HttpError(404, `contacts with id=${contactId} not found!`)
+    throw HttpError(404, `contacts with id=${_id} not found!`)
   }
   res.json(getId)
 };
 
 const addContact = async (req, res, next) => {
-  const add = await Contact.create(req.body);
+  const { _id: owner } = req.user;
+  const add = await Contact.create({ ...req.body, owner });
   res.status(201).json(add)
 };
 
 const deleteContact = async (req, res, next) => {
-  const { contactId } = req.params
-  const remove = await Contact.findByIdAndDelete(contactId);
+  const { contactId: _id } = req.params;
+  const { _id: owner } = req.user;
+  const remove = await Contact.findOneAndDelete({ _id, owner });
   if (!remove) {
-    throw HttpError(404, `contacts with id=${contactId} not found!`)
+    throw HttpError(404, `contacts with id=${_id} not found!`)
   }
   res.json(remove)
 };
 
 const putContact = async (req, res, next) => {
-  const { body, params: { contactId } } = req;
-console.log('put=> ',body);
-  const update = await Contact.findByIdAndUpdate(contactId, body);
+  const { body, params: { contactId: _id } } = req;
+  const { _id: owner } = req.user;
+
+  const update = await Contact.findOneAndUpdate({ _id, owner }, body);
     
   if (!update) {
-    throw HttpError(404, `contacts with id=${contactId} not found!`)
+    throw HttpError(404, `contacts with id=${_id} not found!`)
   }
   res.json(update)
 };
