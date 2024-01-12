@@ -1,7 +1,6 @@
 import Contact from "../models/Contact.js"
 import { HttpError } from "../helpers/index.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
-import { trusted } from "mongoose";
 
 // повернення власнику всіх його контактів з урахуванням значення поля фаворіт та пагінацією
 const getAll = async (req, res) => {

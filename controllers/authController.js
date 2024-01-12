@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import User from "../models/Users.js";
+import User from "../models/User.js";
 import { HttpError } from "../helpers/index.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
 
@@ -79,6 +79,7 @@ const logout = async (req, res) => {
     })
 }
 
+// зміна типу підписки користувача
 const subscription = async (req, res) => {
    const { _id } = req.user; 
    const { subscription = "starter" } = req.query;

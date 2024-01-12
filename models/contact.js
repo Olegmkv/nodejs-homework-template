@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
-import { handleSaveError,addUpdateSettings } from "./hooks.js";
 import Joi from "joi";
-import HttpError from "../helpers/HttpError.js"
+import { handleSaveError,addUpdateSettings } from "./hooks.js";
+
 
 // схема бази даних mongoose
 const contactSchema = new Schema({
