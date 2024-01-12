@@ -63,31 +63,29 @@ const login = async (req, res) => {
 
 // повертаємо дані користувача
 const current = async (req, res) => {
-    const { username, email } = req.user;
+    const { email, subscription } = req.user;
     res.json({
-        username,
         email,
+        subscription,
     })
-}
+};
 
 // розлогінювання користувача , прибираєм його токен з бази
 const logout = async (req, res) => {
     const { _id } = req.user;
     await User.findByIdAndUpdate(_id, { token: "" });
-    res.json({
-        message: "Logout success"
-    })
-}
+    res.status(204).json("")
+};
 
 // зміна типу підписки користувача
 const subscription = async (req, res) => {
-   const { _id } = req.user; 
-   const { subscription = "starter" } = req.query;
-   await User.findByIdAndUpdate(_id, { subscription });
-   res.json({
-       message: "Subscription updated"
-   }) 
-}
+    const { _id } = req.user;
+    const { subscription = "starter" } = req.query;
+    await User.findByIdAndUpdate(_id, { subscription });
+    res.json({
+        message: "Subscription updated"
+    })
+};
 
 export default {
     register: ctrlWrapper(register),

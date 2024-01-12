@@ -13,7 +13,7 @@ const authenticate = async (req, res, next) => {
     // виділяємо токен
     const [bearer, token] = authorization.split(" ");
     if (!bearer === "Bearer") {
-        return next(HttpError(401, "No Bearer autorization"));
+        return next(HttpError(401, "Not authorized"));
     };
     // верифікуємо токен, порівнюємо зі збереженим в базі у користувача
     try {
@@ -29,7 +29,7 @@ const authenticate = async (req, res, next) => {
         next();
     }
     catch (error) {
-        next(HttpError(401, error.message));
+        next(HttpError(401, "Not authorized"));
     };
 };
 
