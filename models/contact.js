@@ -2,7 +2,6 @@ import { Schema, model } from "mongoose";
 import Joi from "joi";
 import { handleSaveError,addUpdateSettings } from "./hooks.js";
 
-
 // схема бази даних mongoose
 const contactSchema = new Schema({
     name: {
@@ -30,8 +29,9 @@ const contactSchema = new Schema({
     timestamps: true,
 });
 
-// монгус хук: після додавання, при помилці, 
+// монгус хук: після додавання, при помилці,
 // задати статус помилки 400 і продовжити виконання коду
+// не змінюнює 
 contactSchema.post("save", handleSaveError);
 
 // після оновлення, в разі помилки задати їй стаус 400  
@@ -63,4 +63,4 @@ export const schemeUpdateStatus = Joi.object({
 // створюємо модель-класс
 const Contact = model("contact", contactSchema);
 
-export default Contact
+export default Contact 
