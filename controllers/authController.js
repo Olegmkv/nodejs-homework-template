@@ -111,7 +111,8 @@ const avatarChange = async (req, res) => {
             .write(newPath)
     })
         .catch((err) => {
-        throw HttpError(500, err);
+        console.log(err);
+        throw HttpError(401, "Not authorized");
     });
   
     // запамятовуємо шлях до попередньої аватарки
@@ -121,19 +122,20 @@ const avatarChange = async (req, res) => {
     const avatarURL = path.join("avatars", newFilename);
     await User.findByIdAndUpdate(_id, { avatarURL });
 
-    // вилучаємо нову необроблену і попередню аватарку
+    // вилучаємо нову тимчасову і попередню аватарки
+    // при помилці не зупиняємо обробку запиту
     await fs.unlink(tmpPath).catch(() =>
-        console.log(`problem to remove files: ${tmpPath}`)
+        console.log(`problem with removing files: ${tmpPath}`)
     );
     if (oldPath.indexOf("www.gravatar.com")===-1) {
         const oldFullPath = path.join("public", oldPath)
         await fs.unlink(oldFullPath).catch(() =>
-            console.log(`problem to remove files: ${oldFullPath}`)
+            console.log(`problem with removing files: ${oldFullPath}`)
         );
     };
 
     res.json({
-        avatarURL: avatarURL
+        avatarURL
     });
 
 };
