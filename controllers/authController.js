@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import gravatar from "gravatar";
 import fs from "fs/promises";
 import path from "path";
+import Jimp from "jimp";
 import User from "../models/User.js";
 import { HttpError } from "../helpers/index.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
@@ -10,7 +11,7 @@ import ctrlWrapper from "../decorators/ctrlWrapper.js";
 const { JWT_SECRET } = process.env;
 const avatarPath = path.resolve("public", "avatars");
 
-// реєстрація
+// ============================ реєстрація
 const register = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -32,7 +33,7 @@ const register = async (req, res) => {
     }});
 };
 
-// автентифікація
+// =================================== автентифікація
 const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -67,7 +68,7 @@ const login = async (req, res) => {
     });
 };
 
-// повертаємо дані користувача
+// ====================== повертаємо дані користувача
 const current = async (req, res) => {
     const { email, subscription } = req.user;
     res.json({
@@ -76,14 +77,14 @@ const current = async (req, res) => {
     });
 };
 
-// розлогінювання користувача , прибираєм його токен з бази
+// === розлогінювання користувача , прибираєм його токен з бази
 const logout = async (req, res) => {
     const { _id } = req.user;
     await User.findByIdAndUpdate(_id, { token: "" });
     res.status(204).json("")
 };
 
-// зміна типу підписки користувача
+// ================== зміна типу підписки користувача
 const subscription = async (req, res) => {
     const { _id } = req.user;
     const { subscription = "starter" } = req.query;
@@ -93,26 +94,44 @@ const subscription = async (req, res) => {
     });
 };
 
+// ====================== заміна аватарки користувача
 const avatarChange = async (req, res) => {
     const { _id } = req.user;
- 
-    // переносимо з тимчасового каталогу до публічного
     const { path: tmpPath, filename } = req.file;
+    
     const newFilename = _id +'_' + filename;
     const newPath = path.join(avatarPath, newFilename);
-    await fs.rename(tmpPath, newPath);
     
+    // оптимизуємо зображення отримане в тичасовому каталогу
+    // та зберігаємо у каталозі для публічного користування
+    Jimp.read(tmpPath)
+    .then((avva) => {
+        return avva
+            .resize(250, 250)
+            .quality(70)
+            .write(newPath)
+    })
+        .catch((err) => {
+        throw HttpError(500, err);
+    });
+  
+    // запамятовуємо шлях до попередньої аватарки
     const { avatarURL: oldPath } = await User.findById(_id);
 
     // формуємо відносний шлях та прописуємо в базу шлях до нового аватару
     const avatarURL = path.join("avatars", newFilename);
     await User.findByIdAndUpdate(_id, { avatarURL });
 
-    // вилучаємо старий файл
-    const oldFullPath = path.join("public", oldPath)
-    await fs.unlink(oldFullPath).catch(() =>
-        console.log(`problem to remove file: ${oldFullPath}`)
+    // вилучаємо нову необроблену і попередню аватарку
+    await fs.unlink(tmpPath).catch(() =>
+        console.log(`problem to remove files: ${tmpPath}`)
     );
+    if (oldPath.indexOf("www.gravatar.com")===-1) {
+        const oldFullPath = path.join("public", oldPath)
+        await fs.unlink(oldFullPath).catch(() =>
+            console.log(`problem to remove files: ${oldFullPath}`)
+        );
+    };
 
     res.json({
         avatarURL: avatarURL

@@ -3,9 +3,9 @@ import path from "path";
 import { HttpError } from "../../helpers/index.js";
 
 const destination = path.resolve("tmp");
-const supportedType = ["jpeg", "png", "bmp", "tiff", "gif"];
+const supportedType = ["jpeg", "jpg", "png", "bmp", "tiff", "gif"];
 
-// формуємо унікальне імя для збереження файлу
+// описуємо сховище та унікальне імя для збереження файлу
 const storage = multer.diskStorage({
     destination,
     filename: (req, file, callback) => {
@@ -29,7 +29,7 @@ const fileFilter = (req, file, callback) => {
     callback(null, file);
 };
 
-// створюємо обєкт мультера за налаштуваннями
+// створюємо обєкт мультера використовуючи налаштування
 const upload = multer({
     storage,
     limits,

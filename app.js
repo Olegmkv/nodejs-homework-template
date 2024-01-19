@@ -10,18 +10,19 @@ const app = express();
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short';
 
 app.use(logger(formatsLogger));
+// дозвіл на міждоменні запити 
 app.use(cors());
+// парсер json
 app.use(express.json());
+// дозвіл отримувати статичні файли
 app.use(express.static("public"));
-
+// endpoint оброблюються у відповідних роутерах
 app.use('/api/users', authRouter);
 app.use('/api/contacts', contactsRouter);
-
-// відсутній маршрут 
+// обробка відсутнього маршруту 
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' });
 })
-
 // обробка помилки
 app.use((err, req, res, next) => {
   const { status = 500, message = "Server error" } = err;
