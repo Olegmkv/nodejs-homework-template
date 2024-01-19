@@ -29,7 +29,6 @@ const register = async (req, res) => {
         user: {
             email: newUser.email,
             subscription: newUser.subscription,
-            avatarURL,
     }});
 };
 
@@ -102,8 +101,8 @@ const avatarChange = async (req, res) => {
     const newFilename = _id +'_' + filename;
     const newPath = path.join(avatarPath, newFilename);
     
-    // оптимизуємо зображення отримане в тичасовому каталогу
-    // та зберігаємо у каталозі для публічного користування
+    // оптимизуємо зображення отримане в тичасовому каталозі
+    // та зберігаємо його у теку для публічного користування
     Jimp.read(tmpPath)
     .then((avva) => {
         return avva
