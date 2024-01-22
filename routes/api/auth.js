@@ -16,6 +16,6 @@ authRouter.post('/logout', authenticate, authController.logout);
 
 authRouter.patch('/', authenticate, validateBody(userSubscribeSchema), authController.subscription);
 
-authRouter.patch('/avatars', upload.single("avatarURL"), authenticate, authController.avatarChange);
+authRouter.patch('/avatars', authenticate, upload.single("avatarURL"), authController.avatarChange);
 
 export default authRouter;

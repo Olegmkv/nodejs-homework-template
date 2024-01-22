@@ -108,7 +108,7 @@ const avatarChange = async (req, res) => {
         return avva
             .resize(250, 250)
             .quality(70)
-            .write(newPath)
+            .writeAsync(newPath)
     })
         .catch((err) => {
         console.log(err);
