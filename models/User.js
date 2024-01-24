@@ -29,6 +29,13 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
+    verify: {
+        type: Boolean,
+        default: false,
+    },
+    verificationToken: {
+        type: String,
+    }
 }, {
     versionKey: false,
     timestamps: true,
@@ -58,6 +65,11 @@ export const userSigninSchema = Joi.object({
 export const userSubscribeSchema = Joi.object({
     subscription: Joi.string().valid(...subscriptionExp)
 })
+
+export const userEmailSchema = Joi.object({
+    email: Joi.string().pattern(emailRegexp).required().min(5)
+        .messages({ 'any.required': `missing required field email` }),
+});
 
 // створюємо модель-класс
 const User = model("user", userSchema);
